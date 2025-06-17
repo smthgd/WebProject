@@ -9,6 +9,8 @@ public class RoomController : ControllerBase
 {
     private static Dictionary<Room, List<Movie>> rooms = new Dictionary<Room, List<Movie>>();
     
+    private static Dictionary<int, List<int>> watchedMovies = new Dictionary<int, List<int>>();
+    
     private readonly WebProjectDbContext _context;
 
     public RoomController(WebProjectDbContext context)
@@ -65,37 +67,6 @@ public class RoomController : ControllerBase
 
         return Ok();
     }
-
-    [HttpGet("{roomCode}/next-movie")]
-    public IActionResult GetNextMovie(int roomCode, [FromQuery] int userId)
-    {
-        var room = rooms.Keys.FirstOrDefault(r => r.Id == roomCode);
-
-        if (room == null)
-        {
-            return NotFound("Room not found");
-        }
-
-        // Получаем список выборов пользователя, если он существует
-        List<int> watchedMoviesList;
-
-        if (!watchedMovies.TryGetValue(userId, out watchedMoviesList))
-        {
-            watchedMoviesList = new List<int>();
-        }
-
-        var movies = rooms[room];
-
-        // Получаем следующий фильм, который еще не был просмотрен
-        var nextMovie = movies.FirstOrDefault(m => !watchedMoviesList.Contains(m.Id));
-
-        if (nextMovie != null)
-        {
-            return Ok(nextMovie);
-        }
-
-        return NotFound("No more movies available");
-    }
     
     [HttpGet("{roomCode}/movies")]
     public async Task<IActionResult> GetMovies(int roomCode)
@@ -139,5 +110,34 @@ public class RoomController : ControllerBase
 
             return StatusCode((int)response.StatusCode, "Failed to load movies");
         }
+    }
+    
+    [HttpGet("{roomCode}/next-movie")]
+    public IActionResult GetNextMovie(int roomCode, [FromQuery] int userId)
+    {
+        var room = rooms.Keys.FirstOrDefault(r => r.Id == roomCode);
+
+        if (room == null)
+        {
+            return NotFound("Room not found");
+        }
+
+        List<int> watchedMoviesList;
+
+        if (!watchedMovies.TryGetValue(userId, out watchedMoviesList))
+        {
+            watchedMoviesList = new List<int>();
+        }
+
+        var movies = rooms[room];
+
+        var nextMovie = movies.FirstOrDefault(m => !watchedMoviesList.Contains(m.Id));
+
+        if (nextMovie != null)
+        {
+            return Ok(nextMovie);
+        }
+
+        return NotFound("No more movies available");
     }
 }
