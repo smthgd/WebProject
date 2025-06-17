@@ -140,4 +140,22 @@ public class RoomController : ControllerBase
 
         return NotFound("No more movies available");
     }
+
+    [HttpPost("{roomCode}/watched-movies")]
+    public async Task<IActionResult> AddWatchedMovie(int roomCode, [FromBody] int movieId, [FromQuery] int userId)
+    {
+        if (!rooms.Keys.Any(room => room.Id == roomCode))
+        {
+            return NotFound("Room not found");
+        }
+
+        if (!watchedMovies.ContainsKey(userId))
+        {
+            watchedMovies[userId] = new List<int>();
+        }
+
+        watchedMovies[userId].Add(movieId);
+
+        return Ok("Movie added in watched");
+    }
 }
