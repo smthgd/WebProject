@@ -39,4 +39,28 @@ public class AuthController : ControllerBase
 
         return Ok("User registered successfully");
     }
+    
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] UserRegistrationDto loginDto)
+    {
+        var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == loginDto.Email);
+    
+        if (user == null)
+        {
+            return Unauthorized("Invalid username or password");
+        }
+
+        if (!_hashingService.VerifyPassword(loginDto.Password, user.PasswordHash))
+        {
+            return Unauthorized("Invalid password");
+        }
+
+        var userData = new
+        {
+            userName = user.Username,
+            email = user.Email 
+        };
+
+        return Ok(userData);
+    }
 }
