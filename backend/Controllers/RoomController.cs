@@ -96,4 +96,48 @@ public class RoomController : ControllerBase
 
         return NotFound("No more movies available");
     }
+    
+    [HttpGet("{roomCode}/movies")]
+    public async Task<IActionResult> GetMovies(int roomCode)
+    {
+        var room = rooms.Keys.FirstOrDefault(r => r.Id == roomCode);
+
+        if (room == null)
+        {
+            return NotFound("Room not found");
+        }
+
+        using (var httpClient = new HttpClient())
+        {
+            var apiKey = "KTZV0EX-47647JH-JDRJYQ8-HSENZ44";
+            httpClient.DefaultRequestHeaders.Add("X-API-KEY", apiKey);
+            var response = await httpClient.GetAsync("https://api.kinopoisk.dev/v1.3/movie?limit=30");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+                var moviesResponse = JsonSerializer.Deserialize<KinopoiskResponse>(jsonResponse, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (moviesResponse != null && moviesResponse.Docs != null)
+                {
+                    var movies = moviesResponse.Docs.Select(m => new Movie
+                    {
+                        Id = m.Id,
+                        Name = m.Name,
+                        Rating = m.Rating.Kp,
+                        PosterUrl = m.Poster.Url
+                    }).ToList();
+
+                    rooms[room] = movies;
+
+                    return Ok(movies);
+                }
+            }
+
+            return StatusCode((int)response.StatusCode, "Failed to load movies");
+        }
+    }
 }
