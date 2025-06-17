@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using backend.Data;
 using backend.DTOs;
+using backend.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace DefaultNamespace;
@@ -15,10 +16,13 @@ public class RoomController : ControllerBase
     private static Dictionary<int, List<int>> likedMovies = new Dictionary<int, List<int>>();
     
     private readonly WebProjectDbContext _context;
-
-    public RoomController(WebProjectDbContext context)
+    
+    private readonly WebSocketHandler _webSocketHandler;
+    
+    public RoomController(WebProjectDbContext context, WebSocketHandler webSocketHandler)
     {
         _context = context;
+        _webSocketHandler = webSocketHandler;
     }
     
     [HttpPost("create")]
@@ -179,21 +183,21 @@ public class RoomController : ControllerBase
 
         likedMovies[userId].Add(movieId);
 
-        // Проверка на совпадение
         if (likedMovies.Values.All(choices => choices.Contains(movieId)) && likedMovies.Count != 1)
         {
-            // Отправка уведомления через WebSocket
             var message = $"Match found for movie ID: {movieId}";
+            
+            foreach (var user in likedMovies.Keys)
+            {
+                await _webSocketHandler.SendMessage(user, message);
+            }
 
-            // Получение списка фильмов из комнаты
             if (rooms.TryGetValue(room, out var movies))
             {
-                // Поиск фильма по movieId
                 var movie = movies.FirstOrDefault(m => m.Id == movieId);
 
                 if (movie != null)
                 {
-                    // Создание объекта MatchedFilm с реальными значениями
                     var matchedFilm = new Movie
                     {
                         Id = movie.Id,
@@ -202,11 +206,9 @@ public class RoomController : ControllerBase
                         PosterUrl = movie.PosterUrl
                     };
 
-                    // Добавление фильма в контекст
                     _context.MatchedFilms.Add(matchedFilm);
                     await _context.SaveChangesAsync();
 
-                    // Установка связи с комнатой
                     room.MatchedFilmId = movie.Id;
                     await _context.SaveChangesAsync();
 
