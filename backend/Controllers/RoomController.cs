@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using backend.Data;
+using backend.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace DefaultNamespace;
@@ -219,5 +220,46 @@ public class RoomController : ControllerBase
         }
 
         return Ok("Swipe recorded");
+    }
+    
+    [HttpGet("{roomId}/history")]
+    public async Task<IActionResult> GetRoomHistory(string roomId)
+    {
+        int roomCode = int.Parse(roomId);
+
+        var room = await _context.Rooms
+            .Include(r => r.MatchedFilm)
+            .FirstOrDefaultAsync(r => r.Id == roomCode);
+
+        if (room == null)
+        {
+            return NotFound("Room not found");
+        }
+
+        var roomUsers = await _context.RoomUsers
+            .Where(ru => ru.RoomId == roomCode)
+            .Select(ru => ru.UserId)
+            .ToListAsync();
+
+        var users = await _context.Users
+            .Where(u => roomUsers.Contains(u.Id))
+            .Select(u => new UserDto { Id = u.Id, Username = u.Username })
+            .ToListAsync();
+
+        var matchedFilmDto = room.MatchedFilm != null ? new MatchedFilmDto
+        {
+            Id = room.MatchedFilm.Id,
+            Title = room.MatchedFilm.Name, 
+        } : null;
+
+        var history = new RoomHistoryDto
+        {
+            RoomId = room.Id,
+            CreationDate = room.CreationDate,
+            Users = users,
+            MatchedFilms = matchedFilmDto != null ? new List<MatchedFilmDto> { matchedFilmDto } : new List<MatchedFilmDto>()
+        };
+
+        return Ok(history);
     }
 }
