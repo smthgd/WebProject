@@ -6,6 +6,15 @@ namespace backend.Utilities;
 public class WebSocketHandler
 {
     private static Dictionary<int, WebSocket> _sockets = new Dictionary<int, WebSocket>();
+    
+    public async Task SendMessage(int userId, string message)
+    {
+        if (_sockets.TryGetValue(userId, out var socket))
+        {
+            var buffer = Encoding.UTF8.GetBytes(message);
+            await socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+        }
+    }
 
     public async Task HandleWebSocket(WebSocket webSocket, int userId)
     {
