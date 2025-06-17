@@ -65,4 +65,35 @@ public class RoomController : ControllerBase
 
         return Ok();
     }
+
+    [HttpGet("{roomCode}/next-movie")]
+    public IActionResult GetNextMovie(int roomCode, [FromQuery] int userId)
+    {
+        var room = rooms.Keys.FirstOrDefault(r => r.Id == roomCode);
+
+        if (room == null)
+        {
+            return NotFound("Room not found");
+        }
+
+        // Получаем список выборов пользователя, если он существует
+        List<int> watchedMoviesList;
+
+        if (!watchedMovies.TryGetValue(userId, out watchedMoviesList))
+        {
+            watchedMoviesList = new List<int>();
+        }
+
+        var movies = rooms[room];
+
+        // Получаем следующий фильм, который еще не был просмотрен
+        var nextMovie = movies.FirstOrDefault(m => !watchedMoviesList.Contains(m.Id));
+
+        if (nextMovie != null)
+        {
+            return Ok(nextMovie);
+        }
+
+        return NotFound("No more movies available");
+    }
 }
