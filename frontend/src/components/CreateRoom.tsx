@@ -1,5 +1,6 @@
 import React from 'react';
 import './Join/Join.css';
+import { API_URL } from '../config';
 
 interface CreateRoomProps {
     setRoomCode: (code: string) => void;
@@ -7,7 +8,8 @@ interface CreateRoomProps {
 
 const CreateRoom: React.FC<CreateRoomProps> = ({ setRoomCode }) => {
     const createRoom = async () => {
-        const response = await fetch('http://localhost:5104/api/room/create', {
+        try{
+            const response = await fetch(`${API_URL}/api/room/create`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -15,6 +17,11 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setRoomCode }) => {
         });
         const newRoomCode = await response.text();
         setRoomCode(newRoomCode); // Устанавливаем новый код комнаты
+        }
+        catch(error){
+            console.log(error)
+        }
+
     };
 
     return (

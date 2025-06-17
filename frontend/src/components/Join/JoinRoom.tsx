@@ -1,5 +1,6 @@
 import React from 'react';
 import './Join.css';
+import { API_URL } from '../../config';
 
 interface JoinRoomProps {
     roomCode: string;
@@ -15,26 +16,31 @@ const JoinRoom: React.FC<JoinRoomProps> = ({ roomCode, setRoomCode, userId, Crea
             alert('Please enter a room code');
             return;
         }
-        
-        const response = await fetch(`http://localhost:5104/api/room/join/${roomCode}/${userId}`, {
-            method: 'POST',
-        });
-        console.log(response.json())
-        if (response.ok) {
-            console.log('Successfully joined room:', roomCode);
-            await getMovies(roomCode);
-            if (userId) {
-                await getNextMovie(roomCode, userId);
+        try{
+            const response = await fetch(`${API_URL}/api/room/join/${roomCode}/${userId}`, {
+                method: 'POST',
+            });
+
+            if (response.ok) {
+                console.log('Successfully joined room:', roomCode);
+                await getMovies(roomCode);
+                if (userId) {
+                    await getNextMovie(roomCode, userId);
+                } else {
+                    alert('User ID is not available');
+                }
             } else {
-                alert('User ID is not available');
+                alert('Room not found');
             }
-        } else {
-            alert('Room not found');
         }
+        catch(error){
+            console.log(error)
+        }
+        
     };
 
     const getMovies = async (code: string) => {
-        const response = await fetch(`http://localhost:5104/api/room/${code}/movies`);
+        const response = await fetch(`${API_URL}/api/room/${code}/movies`);
         if (response.ok) {
             const moviesData = await response.json();
             console.log('Movies loaded:', moviesData);
@@ -47,7 +53,7 @@ const JoinRoom: React.FC<JoinRoomProps> = ({ roomCode, setRoomCode, userId, Crea
     };
 
     const getNextMovie = async (code: string, userId: string) => {
-        const response = await fetch(`http://localhost:5104/api/room/${code}/next-movie?userId=${userId}`);
+        const response = await fetch(`${API_URL}/api/room/${code}/next-movie?userId=${userId}`);
         if (response.ok) {
             const movieData = await response.json();
             // Здесь можно передать movieData в родительский компонент или сохранить в локальном состоянии

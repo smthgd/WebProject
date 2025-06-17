@@ -8,6 +8,7 @@ import Login from './components/Login/Login';
 import UserMenu from './components/UserMenu';
 import './App.css';
 import logo from './assets/ChoosyLogo.png';
+import { API_URL } from '../../config';
 
 const App: React.FC = () => {
     const [roomCode, setRoomCode] = useState<string>('');
@@ -57,19 +58,25 @@ const App: React.FC = () => {
     };
 
     const getNextMovie = async (roomCode: string, userId: string) => {
-        const response = await fetch(`http://localhost:5104/api/room/${roomCode}/next-movie?userId=${userId}`);
-        if (response.ok) {
-            const movieData = await response.json();
-            setCurrentMovie(movieData); // Устанавливаем текущий фильм
-        } else {
-            alert('No more movies available');
+        try {
+            const response = await fetch(`${API_URL}/api/room/${roomCode}/next-movie?userId=${userId}`);
+            if (response.ok) {
+                const movieData = await response.json();
+                setCurrentMovie(movieData); // Устанавливаем текущий фильм
+            } else {
+                alert('No more movies available');
+            }
         }
+        catch (error){
+            console.log(error)
+        }
+        
     };
 
     const handleSwipe = async (direction: 'left' | 'right') => {
         if (currentMovie) {
             if (userId){
-                const response = await fetch(`http://localhost:5104/api/room/${roomCode}/watched-movies?userId=${userId}`, {
+                const response = await fetch(`${API_URL}/api/room/${roomCode}/watched-movies?userId=${userId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -83,7 +90,7 @@ const App: React.FC = () => {
                             const updatedLikedMovies = [...prev, currentMovie];
 
                             // Вызываем метод MatchChecking с likedMovies
-                            fetch(`http://localhost:5104/api/room/${roomCode}/match-checking?userId=${userId}`, {
+                            fetch(`${API_URL}/api/room/${roomCode}/match-checking?userId=${userId}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -107,7 +114,7 @@ const App: React.FC = () => {
 
     const fetchRoomHistory = async (roomCode: string) => {
         try {
-            const response = await fetch(`http://localhost:5104/api/room/${roomCode}/history`);
+            const response = await fetch(`${API_URL}/api/room/${roomCode}/history`);
             if (response.ok) {
                 const data = await response.json();
                 setRoomHistory(data);
