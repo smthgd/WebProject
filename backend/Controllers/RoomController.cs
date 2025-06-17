@@ -35,4 +35,34 @@ public class RoomController : ControllerBase
 
         return Ok(roomCode);
     }
+    
+    [HttpPost("join/{roomCode}/{userId}")]
+    public async Task<IActionResult> JoinRoom(int roomCode, int userId)
+    {
+        var room = rooms.Keys.FirstOrDefault(r => r.Id == roomCode);
+        
+        if (room == null)
+        {
+            return NotFound("Room not found");
+        }      
+
+        var roomUser = new RoomUser
+        {
+            RoomId = room.Id,
+            UserId =+ 1
+        };
+        
+        _context.RoomUsers.Add(roomUser);
+        
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        return Ok();
+    }
 }
