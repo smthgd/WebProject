@@ -11,6 +11,8 @@ public class RoomController : ControllerBase
     
     private static Dictionary<int, List<int>> watchedMovies = new Dictionary<int, List<int>>();
     
+    private static Dictionary<int, List<int>> likedMovies = new Dictionary<int, List<int>>();
+    
     private readonly WebProjectDbContext _context;
 
     public RoomController(WebProjectDbContext context)
@@ -157,5 +159,65 @@ public class RoomController : ControllerBase
         watchedMovies[userId].Add(movieId);
 
         return Ok("Movie added in watched");
+    }
+    
+    [HttpPost("{roomCode}/match-checking")]
+    public async Task<IActionResult> MatchChecking(int roomCode, [FromBody] int movieId, [FromQuery] int userId)
+    {
+        var room = rooms.Keys.FirstOrDefault(r => r.Id == roomCode);
+        
+        if (room == null)
+        {
+            return NotFound("Room not found");
+        }
+
+        if (!likedMovies.ContainsKey(userId))
+        {
+            likedMovies[userId] = new List<int>();
+        }
+
+        likedMovies[userId].Add(movieId);
+
+        // Проверка на совпадение
+        if (likedMovies.Values.All(choices => choices.Contains(movieId)) && likedMovies.Count != 1)
+        {
+            // Отправка уведомления через WebSocket
+            var message = $"Match found for movie ID: {movieId}";
+
+            // Получение списка фильмов из комнаты
+            if (rooms.TryGetValue(room, out var movies))
+            {
+                // Поиск фильма по movieId
+                var movie = movies.FirstOrDefault(m => m.Id == movieId);
+
+                if (movie != null)
+                {
+                    // Создание объекта MatchedFilm с реальными значениями
+                    var matchedFilm = new Movie
+                    {
+                        Id = movie.Id,
+                        Name = movie.Name,
+                        Rating = movie.Rating,
+                        PosterUrl = movie.PosterUrl
+                    };
+
+                    // Добавление фильма в контекст
+                    _context.MatchedFilms.Add(matchedFilm);
+                    await _context.SaveChangesAsync();
+
+                    // Установка связи с комнатой
+                    room.MatchedFilmId = movie.Id;
+                    await _context.SaveChangesAsync();
+
+                    return Ok("Match found!");
+                }
+                else
+                {
+                    return NotFound("Movie not found");
+                }
+            }
+        }
+
+        return Ok("Swipe recorded");
     }
 }
