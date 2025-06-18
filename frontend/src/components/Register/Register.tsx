@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import './Register.css';
 import { API_URL } from '../../config';
+
 interface RegisterProps {
     onClose: () => void;
 }
@@ -21,14 +23,15 @@ const Register: React.FC<RegisterProps> = ({ onClose }) => {
             });
 
             if (response.ok) {
-                alert('User registered successfully');
+                toast.success('User registered successfully');
                 onClose();
             } else {
-                alert('Registration failed');
+                toast.error('Registration failed');
             }
         }
         catch (error){
-            console.log("Request failed:", error)
+            console.log("Request failed:", error);
+            toast.error('Network error during registration');
         }
 
     };

@@ -1,137 +1,39 @@
-name: Deploy
+name: Build Docker images
 
 on:
-  push:
-    branches: [ main ]
+    push:
+        branches: ["main"]
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    needs: [build-backend, build-frontend]
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '9.0.x'
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-        cache-dependency-path: frontend/package-lock.json
-    
-    - name: Build Backend
-      run: |
-        dotnet restore backend/backend.csproj
-        dotnet publish backend/backend.csproj -c Release -o ./publish/backend
-      env:
-        ASPNETCORE_ENVIRONMENT: Production
-    
-    - name: Build Frontend
-      run: |
-        npm ci
-        npm run build
-      working-directory: ./frontend
-      env:
-        NODE_ENV: production
-    
-    - name: Deploy to Server
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        port: ${{ secrets.SERVER_PORT }}
-        script: |
-          sudo systemctl stop webproject || true
-          
-          sudo mkdir -p /var/www/webproject/backend
-          sudo mkdir -p /var/www/webproject/frontend
-          
-          sudo rm -rf /var/www/webproject/backend/*
-          sudo rm -rf /var/www/webproject/frontend/*
-    
-    - name: Upload Backend Files
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        port: ${{ secrets.SERVER_PORT }}
-        source: "publish/backend/*"
-        target: "/var/www/webproject/backend"
-        strip_components: 1
-    
-    - name: Upload Frontend Files
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        port: ${{ secrets.SERVER_PORT }}
-        source: "frontend/dist/*"
-        target: "/var/www/webproject/frontend"
-        strip_components: 2
-    
-    - name: Setup and Start Application
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        port: ${{ secrets.SERVER_PORT }}
-        script: |
-          sudo chown -R www-data:www-data /var/www/webproject
-          sudo chmod -R 755 /var/www/webproject
-          
-          sudo tee /etc/systemd/system/webproject.service > /dev/null <<EOF
-          [Unit]
-          Description=WebProject Backend
-          After=network.target
-          
-          [Service]
-          Type=exec
-          User=www-data
-          WorkingDirectory=/var/www/webproject/backend
-          ExecStart=/usr/bin/dotnet /var/www/webproject/backend/backend.dll
-          Restart=always
-          RestartSec=10
-          Environment=ASPNETCORE_ENVIRONMENT=Production
-          Environment=ASPNETCORE_URLS=http://localhost:5000
-          
-          [Install]
-          WantedBy=multi-user.target
-          EOF
-          
-          sudo systemctl daemon-reload
-          sudo systemctl enable webproject
-          sudo systemctl start webproject
-          
-          sudo tee /etc/nginx/sites-available/webproject > /dev/null <<EOF
-          server {
-              listen 80;
-              server_name ${{ secrets.DOMAIN_NAME }};
-              
-              location / {
-                  root /var/www/webproject/frontend;
-                  try_files \$uri \$uri/ /index.html;
-              }
-              
-              location /api {
-                  proxy_pass http://localhost:5000;
-                  proxy_http_version 1.1;
-                  proxy_set_header Upgrade \$http_upgrade;
-                  proxy_set_header Connection keep-alive;
-                  proxy_set_header Host \$host;
-                  proxy_cache_bypass \$http_upgrade;
-              }
-          }
-          EOF
-          
-          sudo ln -sf /etc/nginx/sites-available/webproject /etc/nginx/sites-enabled/
-          sudo nginx -t
-          sudo systemctl reload nginx 
+    build-and-push-dockerfile-image:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v2
+              with:
+                  username: ${{ secrets.DOCKERHUB_USERNAME }}
+                  password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v4
+              with:
+                  context: .
+                  file: ./backend/Dockerfile
+                  push: true
+                  tags: |
+                      posaydone/choosy-backend:latest
+                  platforms: linux/amd64
+
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v4
+              with:
+                  context: .
+                  file: ./frontend/Dockerfile
+                  push: true
+                  tags: |
+                      posaydone/choosy-frontend:latest
+                  platforms: linux/amd64
