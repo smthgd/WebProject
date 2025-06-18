@@ -7,7 +7,7 @@ interface CreateRoomProps {
 
 const CreateRoom: React.FC<CreateRoomProps> = ({ setRoomCode }) => {
     const createRoom = async () => {
-        const response = await fetch('http://localhost:5104/api/room/create', {
+        const response = await fetch('http://localhost:5065/api/room/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

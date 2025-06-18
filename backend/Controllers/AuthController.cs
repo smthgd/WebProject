@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DefaultNamespace;
 
+[ApiController]
+[Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
     private readonly WebProjectDbContext _context;

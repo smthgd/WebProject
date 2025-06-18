@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DefaultNamespace;
 
+[ApiController]
+[Route("api/[controller]")]
 public class RoomController : ControllerBase
 {
     private static Dictionary<Room, List<Movie>> rooms = new Dictionary<Room, List<Movie>>();

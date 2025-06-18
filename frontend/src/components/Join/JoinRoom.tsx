@@ -16,7 +16,7 @@ const JoinRoom: React.FC<JoinRoomProps> = ({ roomCode, setRoomCode, userId, Crea
             return;
         }
         
-        const response = await fetch(`http://localhost:5104/api/room/join/${roomCode}/${userId}`, {
+        const response = await fetch(`http://localhost:5065/api/room/join/${roomCode}/${userId}`, {
             method: 'POST',
         });
         console.log(response.json())
@@ -34,7 +34,7 @@ const JoinRoom: React.FC<JoinRoomProps> = ({ roomCode, setRoomCode, userId, Crea
     };
 
     const getMovies = async (code: string) => {
-        const response = await fetch(`http://localhost:5104/api/room/${code}/movies`);
+        const response = await fetch(`http://localhost:5065/api/room/${code}/movies`);
         if (response.ok) {
             const moviesData = await response.json();
             console.log('Movies loaded:', moviesData);
@@ -47,7 +47,7 @@ const JoinRoom: React.FC<JoinRoomProps> = ({ roomCode, setRoomCode, userId, Crea
     };
 
     const getNextMovie = async (code: string, userId: string) => {
-        const response = await fetch(`http://localhost:5104/api/room/${code}/next-movie?userId=${userId}`);
+        const response = await fetch(`http://localhost:5065/api/room/${code}/next-movie?userId=${userId}`);
         if (response.ok) {
             const movieData = await response.json();
             // Здесь можно передать movieData в родительский компонент или сохранить в локальном состоянии

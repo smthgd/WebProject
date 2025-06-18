@@ -57,7 +57,7 @@ const App: React.FC = () => {
     };
 
     const getNextMovie = async (roomCode: string, userId: string) => {
-        const response = await fetch(`http://localhost:5104/api/room/${roomCode}/next-movie?userId=${userId}`);
+        const response = await fetch(`http://localhost:5065/api/room/${roomCode}/next-movie?userId=${userId}`);
         if (response.ok) {
             const movieData = await response.json();
             setCurrentMovie(movieData); // Устанавливаем текущий фильм
@@ -69,7 +69,7 @@ const App: React.FC = () => {
     const handleSwipe = async (direction: 'left' | 'right') => {
         if (currentMovie) {
             if (userId){
-                const response = await fetch(`http://localhost:5104/api/room/${roomCode}/watched-movies?userId=${userId}`, {
+                const response = await fetch(`http://localhost:5065/api/room/${roomCode}/watched-movies?userId=${userId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ const App: React.FC = () => {
                             const updatedLikedMovies = [...prev, currentMovie];
 
                             // Вызываем метод MatchChecking с likedMovies
-                            fetch(`http://localhost:5104/api/room/${roomCode}/match-checking?userId=${userId}`, {
+                            fetch(`http://localhost:5065/api/room/${roomCode}/match-checking?userId=${userId}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -107,7 +107,7 @@ const App: React.FC = () => {
 
     const fetchRoomHistory = async (roomCode: string) => {
         try {
-            const response = await fetch(`http://localhost:5104/api/room/${roomCode}/history`);
+            const response = await fetch(`http://localhost:5065/api/room/${roomCode}/history`);
             if (response.ok) {
                 const data = await response.json();
                 setRoomHistory(data);
@@ -122,7 +122,7 @@ const App: React.FC = () => {
 
     useEffect(() => {
         // Подключение к WebSocket
-        const newSocket = new WebSocket('ws://localhost:5104/ws'); 
+        const newSocket = new WebSocket('ws://localhost:5065/ws'); 
 
         newSocket.onmessage = (event) => {
             const message = event.data;
