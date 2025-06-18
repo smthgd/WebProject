@@ -9,7 +9,7 @@ import Login from "./components/Login/Login";
 import UserMenu from "./components/UserMenu";
 import "./App.css";
 import logo from "./assets/ChoosyLogo.png";
-import { API_URL } from "./config";
+import { API_URL, config } from "./config";
 
 const App: React.FC = () => {
 	const [roomCode, setRoomCode] = useState<string>("");
@@ -139,7 +139,9 @@ const App: React.FC = () => {
 
 	useEffect(() => {
 		// Подключение к WebSocket
-		const newSocket = new WebSocket("ws://localhost:5065/ws");
+		const newSocket = new WebSocket(
+			`ws://${config.apiUrl.split("://")[1]}/ws`,
+		);
 
 		newSocket.onmessage = (event) => {
 			const message = event.data;
