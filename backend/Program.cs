@@ -32,6 +32,7 @@ builder.Services.AddSingleton(new HashingService(hashKey));
 
 var app = builder.Build();
 
+
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment())
 // {
@@ -40,6 +41,11 @@ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
+
+    var application = app.Services.CreateScope().ServiceProvider.GetRequiredService<WebProjectDbContext>();
+    var pendingMigrations = await application.Database.GetPendingMigrationsAsync();
+    if (pendingMigrations != null)
+        await application.Database.MigrateAsync();
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
