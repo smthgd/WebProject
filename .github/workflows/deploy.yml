@@ -37,3 +37,5 @@ jobs:
                   tags: |
                       posaydone/choosy-frontend:latest
                   platforms: linux/amd64
+                  build-args: |
+                      API_URL=http://choosy-backend-8bmcbw-368642-77-110-105-3.traefik.me
