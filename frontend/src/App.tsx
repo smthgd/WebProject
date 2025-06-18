@@ -129,7 +129,7 @@ const App: React.FC = () => {
 
     useEffect(() => {
         // Подключение к WebSocket
-        const newSocket = new WebSocket('ws://localhost:5104/ws'); 
+        const newSocket = new WebSocket('ws://localhost:5065/ws'); 
 
         newSocket.onmessage = (event) => {
             const message = event.data;
