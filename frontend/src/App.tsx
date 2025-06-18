@@ -1,4 +1,5 @@
 import { useState, useEffect  } from 'react';
+import { Toaster, toast } from 'react-hot-toast';
 import CreateRoom from './components/CreateRoom';
 import JoinRoom from './components/Join/JoinRoom';
 import MovieList from './components/MovieList/MovieList';
@@ -8,7 +9,7 @@ import Login from './components/Login/Login';
 import UserMenu from './components/UserMenu';
 import './App.css';
 import logo from './assets/ChoosyLogo.png';
-import { API_URL } from '../../config';
+import { API_URL } from './config';
 
 const App: React.FC = () => {
     const [roomCode, setRoomCode] = useState<string>('');
@@ -64,11 +65,12 @@ const App: React.FC = () => {
                 const movieData = await response.json();
                 setCurrentMovie(movieData); // Устанавливаем текущий фильм
             } else {
-                alert('No more movies available');
+                toast.error('No more movies available');
             }
         }
         catch (error){
-            console.log(error)
+            console.log(error);
+            toast.error('Error loading movie');
         }
         
     };
@@ -104,10 +106,10 @@ const App: React.FC = () => {
 
                     await getNextMovie(roomCode, userId); // Запрашиваем следующий фильм. Нужно поменять айдишник
                 } else {
-                    alert('Error while swiping');
+                    toast.error('Error while swiping');
                 }
             } else {
-                alert('User ID is not available')
+                toast.error('User ID is not available')
             }
         }
     };
@@ -120,10 +122,11 @@ const App: React.FC = () => {
                 setRoomHistory(data);
                 setIsRoomHistoryVisible(true);
             } else {
-                alert('Error fetching room history');
+                toast.error('Error fetching room history');
             }
         } catch (error) {
             console.error('Error fetching room history:', error);
+            toast.error('Error fetching room history');
         }
     };
 
@@ -138,7 +141,7 @@ const App: React.FC = () => {
                 setUserId(id);
             }
             else{
-                alert(message);
+                toast(message);
             }
         };
 
@@ -156,6 +159,30 @@ const App: React.FC = () => {
 
     return (
         <>
+            <Toaster 
+                position="top-center"
+                toastOptions={{
+                    duration: 4000,
+                    style: {
+                        background: '#363636',
+                        color: '#fff',
+                    },
+                    success: {
+                        duration: 3000,
+                        iconTheme: {
+                            primary: '#4ade80',
+                            secondary: '#fff',
+                        },
+                    },
+                    error: {
+                        duration: 4000,
+                        iconTheme: {
+                            primary: '#ef4444',
+                            secondary: '#fff',
+                        },
+                    },
+                }}
+            />
             <header className="app-header">
                 <h1 className="app-title">Choosy</h1>
                 <div className="header-buttons">

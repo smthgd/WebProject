@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { API_URL } from '../../config';
 
 interface LoginProps {
@@ -22,15 +23,16 @@ const Login: React.FC<LoginProps> = ({ onClose, setUserName }) => {
 
             if (response.ok) {
                 const data = await response.json();
-                alert('User logged in successfully');
+                toast.success('User logged in successfully');
                 setUserName(data.userName);
                 onClose();
             } else {
                 const errorData = await response.json();
-                alert(`Login failed: ${errorData.message || response.statusText}`);
+                toast.error(`Login failed: ${errorData.message || response.statusText}`);
             }
         } catch (error) {
             console.log(`Request failed: ${error}`);
+            toast.error('Network error during login');
         }
     };
 

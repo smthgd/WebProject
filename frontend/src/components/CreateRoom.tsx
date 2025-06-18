@@ -1,4 +1,5 @@
 import React from 'react';
+import { toast } from 'react-hot-toast';
 import './Join/Join.css';
 import { API_URL } from '../config';
 
@@ -17,9 +18,11 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setRoomCode }) => {
         });
         const newRoomCode = await response.text();
         setRoomCode(newRoomCode); // Устанавливаем новый код комнаты
+        toast.success('Room created successfully');
         }
         catch(error){
-            console.log(error)
+            console.log(error);
+            toast.error('Network error while creating room');
         }
 
     };
