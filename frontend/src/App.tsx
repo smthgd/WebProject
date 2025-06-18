@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import CreateRoom from "./components/CreateRoom";
 import JoinRoom from "./components/Join/JoinRoom";
-// import MovieList from './components/MovieList/MovieList';
 import MovieCard from "./components/MovieCard";
 import Register from "./components/Register/Register";
 import Login from "./components/Login/Login";
