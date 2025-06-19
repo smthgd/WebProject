@@ -84,7 +84,11 @@ export const fetchRoomHistory = async (roomCode: string) => {
 	}
 };
 
-export const signUp = async (username, password, email) => {
+export const signUp = async (
+	username: string,
+	password: string,
+	email: string,
+) => {
 	try {
 		const response = await fetch(`${API_URL}/api/auth/register`, {
 			method: "POST",
@@ -105,7 +109,7 @@ export const signUp = async (username, password, email) => {
 	}
 };
 
-export const signIn = async (email, password) => {
+export const signIn = async (email: string, password: string) => {
 	try {
 		const response = await fetch(`${API_URL}/api/auth/login`, {
 			method: "POST",

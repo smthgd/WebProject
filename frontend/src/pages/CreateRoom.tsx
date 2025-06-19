@@ -20,7 +20,7 @@ const CreateRoom: React.FC = () => {
 	return (
 		<div
 			style={{
-				opacity: isLoading && 0.5,
+				opacity: isLoading ? 0.5 : undefined,
 			}}
 		>
 			<input

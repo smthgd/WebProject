@@ -76,14 +76,14 @@ const MoviePicker: React.FC = () => {
 				<img
 					className="movie__poster"
 					style={{
-						opacity: isLoading && 0.5,
+						opacity: isLoading ? 0.5 : undefined,
 					}}
 					src={currentMovie.posterUrl}
 					alt={currentMovie.name}
 				/>
 				<div
 					style={{
-						opacity: isLoading && 0.5,
+						opacity: isLoading ? 0.5 : undefined,
 					}}
 					className="movie__description"
 				>

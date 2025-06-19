@@ -1,6 +1,4 @@
 import { create } from "zustand";
-import { toast } from "react-hot-toast";
-import { API_URL } from "../config";
 
 interface StoreState {
 	userIsLoaded: boolean;
@@ -30,7 +28,7 @@ interface StoreState {
 	handleLogout: () => void;
 }
 
-export const useStore = create<StoreState>((set, get) => ({
+export const useStore = create<StoreState>((set) => ({
 	roomCode: "",
 	userIsLoaded: false,
 	setUserIsLoaded: (userIsLoaded) => set({ userIsLoaded }),

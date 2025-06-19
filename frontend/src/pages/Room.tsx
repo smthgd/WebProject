@@ -7,14 +7,8 @@ import toast from "react-hot-toast";
 
 const CreateRoom: React.FC = () => {
 	const { roomCode: roomCodeParam } = useParams<{ roomCode: string }>();
-	const {
-		userId,
-		setRoomCode,
-		roomCode,
-		setCurrentMovie,
-		roomHistory,
-		userIsLoaded,
-	} = useStore();
+	const { userId, setRoomCode, setCurrentMovie, roomHistory, userIsLoaded } =
+		useStore();
 	const [isRoomHistoryVisible] = useState(false);
 
 	const [isLoading, setIsLoading] = useState(true);
