@@ -60,7 +60,7 @@ public class RoomController : ControllerBase
         var roomUser = new RoomUser
         {
             RoomId = room.Id,
-            UserId =+ 1
+            UserId = userId
         };
         
         _context.RoomUsers.Add(roomUser);
