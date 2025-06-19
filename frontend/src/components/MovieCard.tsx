@@ -17,7 +17,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onSwipe }) => {
 
     return (
         <div className="movie-card">
-            <img src={movie.posterUrl} alt={movie.name} />
+            <img className="movie-poster" src={movie.posterUrl} alt={movie.name} />
             <h3>{movie.name}</h3>
             <p>Rating: {movie.rating}</p>
             <button onClick={() => onSwipe('left')}>👎 Dislike</button>

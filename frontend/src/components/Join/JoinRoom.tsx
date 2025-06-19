@@ -9,6 +9,7 @@ interface JoinRoomProps {
 	userId: string | null;
 	CreateRoomComponent: React.FC<{ setRoomCode: (code: string) => void }>;
 	setCurrentMovie: (movie: any[]) => void;
+	onJoinSuccess: () => void;
 }
 
 const JoinRoom: React.FC<JoinRoomProps> = ({
@@ -17,6 +18,7 @@ const JoinRoom: React.FC<JoinRoomProps> = ({
 	userId,
 	CreateRoomComponent,
 	setCurrentMovie,
+	onJoinSuccess,
 }) => {
 	const joinRoom = async () => {
 		if (!roomCode) {
@@ -39,6 +41,7 @@ const JoinRoom: React.FC<JoinRoomProps> = ({
 				} else {
 					toast.error("User ID is not available");
 				}
+				onJoinSuccess();
 			} else {
 				toast.error("Room not found");
 			}

@@ -22,6 +22,7 @@ const App: React.FC = () => {
 	const [isStarted, setIsStarted] = useState(false);
 	const [roomHistory, setRoomHistory] = useState<any>(null);
 	const [isRoomHistoryVisible, setIsRoomHistoryVisible] = useState(false);
+	const [isInRoom, setIsInRoom] = useState(false);
 
 	const handleButtonClick = () => {
 		setIsStarted(true);
@@ -136,6 +137,16 @@ const App: React.FC = () => {
 		}
 	};
 
+	const handleJoinRoomSuccess = () => {
+		setIsInRoom(true);
+	};
+
+	const handleLeaveRoom = () => {
+		setRoomCode("");
+		setIsInRoom(false);
+		window.location.reload();
+	};
+
 	useEffect(() => {
 		// Подключение к WebSocket
 		const newSocket = new WebSocket(
@@ -244,22 +255,28 @@ const App: React.FC = () => {
 
 				{isStarted && (
 					<>
-						<JoinRoom
-							roomCode={roomCode}
-							setRoomCode={setRoomCode}
-							userId={userId}
-							CreateRoomComponent={CreateRoom}
-							setCurrentMovie={setCurrentMovie}
-						/>
+						{!isInRoom ? (
+							<JoinRoom
+								roomCode={roomCode}
+								setRoomCode={setRoomCode}
+								userId={userId}
+								CreateRoomComponent={CreateRoom}
+								setCurrentMovie={setCurrentMovie}
+								onJoinSuccess={handleJoinRoomSuccess}
+							/>
+						) : (
+							<div className="room-info-block">
+								<p>Room code: <b>{roomCode}</b></p>
+								<button className="button" onClick={handleLeaveRoom}>Leave room</button>
+							</div>
+						)}
 
-						{currentMovie ? (
+						{isInRoom && currentMovie ? (
 							<MovieCard
 								movie={currentMovie}
 								onSwipe={(direction) => handleSwipe(direction)}
 							/>
-						) : (
-							<p></p> // TODO: заменить на чтение состояния
-						)}
+						) : null}
 						<p>Your ID: {userId}</p>
 
 						{console.log(roomHistory)}
