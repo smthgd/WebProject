@@ -41,6 +41,7 @@
   color: #888;
 }
 
+
 body {
   color: #fff;
   margin: 0;
@@ -53,14 +54,15 @@ body {
 }
 
 .blur-background {
-  position: relative;
+  position: flex;
   background-color: rgba(0, 0, 0, 0.5); 
   backdrop-filter: blur(10px); 
   color: white; 
   padding: 20px;
   border-radius: 10px;
   margin: 20px auto;
-  width: 800px; 
+  width: auto; 
+  max-width: 800px;
   text-align: center;
   font-size: 1.5rem;
 }
@@ -109,8 +111,7 @@ body {
   padding: 10px 15px; 
   cursor: pointer; 
   font-size: 1rem; 
-  margin-right: 20px; 
-  color: #61dafb; 
+  margin-right: 10px; 
   transition: background-color 0.3s, border-color 0.3s; 
 }
 
@@ -118,4 +119,41 @@ body {
   background-color: #61dafb; 
   border-color: #21a1f1;
   color: white; 
+}
+
+.liked-movies{
+  color:white;
+}
+.liked-movies-list {
+  background: rgba(30, 40, 60, 0.35);
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(30, 40, 60, 0.10);
+  padding: 5px 16px 14px 16px;
+  margin: 30px auto 20px auto;
+  max-width: 600px;
+  backdrop-filter: blur(8px);
+  text-align: center;
+}
+
+.liked-movies-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.liked-movies-list li {
+  background: transparent;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 500;
+  box-shadow: none;
+  transition: background 0.18s;
+}
+.liked-movies-list li:last-child {
+  margin-bottom: 0;
+}
+.liked-movies-list li:hover {
+  background: rgba(255,255,255,0.07);
 }

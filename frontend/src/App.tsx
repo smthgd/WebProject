@@ -285,18 +285,17 @@ const App: React.FC = () => {
 								</ul>
 							</div>
 						)}
-					</>
-				)}
 
-				{likedMovies.length > 0 && (
-					<div>
-						<h2>Liked Movies</h2>
-						<ul>
-							{likedMovies.map((movie) => (
-								<li key={movie.id}>{movie.name}</li>
-							))}
-						</ul>
-					</div>
+						{likedMovies.length > 0 && (<div className="liked-movies-list">
+							<h2 className="liked-movies">Liked Movies</h2>
+							<hr />
+							<ul>
+								{likedMovies.map((movie) => (
+									<li key={movie.id}>{movie.name}</li>
+								))}
+							</ul>
+						</div>)}
+					</>
 				)}
 
 				{isRegisterOpen && (

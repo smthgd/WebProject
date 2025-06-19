@@ -20,8 +20,8 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onSwipe }) => {
             <img src={movie.posterUrl} alt={movie.name} />
             <h3>{movie.name}</h3>
             <p>Rating: {movie.rating}</p>
-            <button onClick={() => onSwipe('left')}>Dislike</button>
-            <button onClick={() => onSwipe('right')}>Like</button>
+            <button onClick={() => onSwipe('left')}>👎 Dislike</button>
+            <button onClick={() => onSwipe('right')}>❤️ Like</button>
         </div>
     );
 };
