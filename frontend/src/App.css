@@ -14,8 +14,15 @@ html {
 }
 
 main {
+	margin: 0 auto;
 	flex: 1;
 	padding: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.container {
 }
 
 .hero-block {
@@ -91,6 +98,7 @@ body {
 	max-width: 800px;
 	text-align: center;
 	font-size: 1.5rem;
+	line-height: 36px;
 }
 
 .app-header {
